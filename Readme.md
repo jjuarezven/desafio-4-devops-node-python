@@ -50,6 +50,10 @@ No esperamos una solución de nivel productivo, pero esperamos que demuestre que
 - No publique su solución en línea!
 
 
+### Tips
+
+Pueden seguir esta documentación de referencia https://docs.docker.com/compose/startup-order/
+
 
 ¡Eso es todo!
 
