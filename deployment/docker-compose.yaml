@@ -1,10 +1,10 @@
 version: "3"
 
 services:
-  
   # MySQL database
-  db: 
+  db:
     image: mysql:latest
+    container_name: db
     networks:
       - hellodevops-net
     ports:
@@ -12,28 +12,35 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     volumes:
-      - .:/docker-entrypoint-initdb.d
-    environment: 
+      - ./:/docker-entrypoint-initdb.d
+    environment:
       MYSQL_ROOT_PASSWORD: password
-  
-  # RabbitMQ 
+
+  # RabbitMQ
   mq:
     image: rabbitmq:3
+    container_name: mq
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
     networks:
       - hellodevops-net
     ports:
-      - "5672:5762"
-  
+      - "5672:5672"
+
   # hello-node application
   hello-node:
     build: ../hello-node
-    volumes: 
+    volumes:
       - ../hello-node:/opt/hello-node
+    container_name: node-app
     networks:
       - hellodevops-net
     ports:
       - "9443:9443"
     restart: on-failure
+    depends_on:
+      - "db"
+      - "mq"
     environment:
       RABBITMQ_HOST: mq
       MYSQL_HOST: db
@@ -42,8 +49,9 @@ services:
   # hello-python application
   hello-python:
     build: ../hello-python
-    volumes: 
+    volumes:
       - ../hello-python:/opt/hello-python
+    container_name: python-app
     networks:
       - hellodevops-net
     ports:
@@ -54,4 +62,3 @@ services:
 networks:
   hellodevops-net:
     driver: bridge
-
